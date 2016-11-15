@@ -64,14 +64,15 @@ describe('Off Canvas', function() {
       plugin.$triggers.should.have.attr('aria-expanded', 'false');
     });
 
-    it('closes Off Canvas on outside click if closeOnClick option is true', function(done) {
+    it('closes Off Canvas on outside click if closeOnClick and contentOverlay options are true', function(done) {
       $html = $(template).appendTo('body');
-      plugin = new Foundation.OffCanvas($html.find('[data-off-canvas]'), {closeOnClick: true});
+      plugin = new Foundation.OffCanvas($html.find('[data-off-canvas]'), {closeOnClick: true, contentOverlay: true});
 
-      plugin.$exiter.should.be.an('object');
+      plugin.$overlay.should.be.an('object');
 
       $html.one(Foundation.transitionend($html), function() {
-        plugin.$exiter.trigger('click');
+        console.log('INSIDE!');
+        plugin.$overlay.trigger('click');
         plugin.$element.should.not.have.class('is-open');
         done();      
       });
@@ -100,7 +101,7 @@ describe('Off Canvas', function() {
 
       $html.one(Foundation.transitionend($html), function() {
         plugin.$element.should.have.class('is-open');
-        $html.find('[data-off-canvas-wrapper]').should.have.class('is-off-canvas-open');
+        $('body').should.have.class('is-off-canvas-open');
         done();
       });
 
@@ -113,9 +114,13 @@ describe('Off Canvas', function() {
 
 
       $html.one(Foundation.transitionend($html), function() {
-        plugin.$element.should.have.attr('tabindex', '-1');
-        plugin.$element[0].should.be.equal(document.activeElement);
-        done();
+        // plugin.$element.should.have.attr('tabindex', '-1');
+
+        // Add timeout so that listener in plugin is fired first
+        setTimeout(function() {
+          $html.find('a, button').eq(0)[0].should.be.equal(document.activeElement);
+          done();
+        }, 1);
       });
 
       plugin.open();      
@@ -126,7 +131,7 @@ describe('Off Canvas', function() {
       plugin = new Foundation.OffCanvas($html.find('[data-off-canvas]'), {trapFocus: true});
 
       $html.one(Foundation.transitionend($html), function() {
-        plugin.$element.should.have.attr('tabindex', '-1');
+        // plugin.$element.should.have.attr('tabindex', '-1');
         done();
       });
 
